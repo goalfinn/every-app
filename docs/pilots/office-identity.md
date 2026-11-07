@@ -40,3 +40,9 @@ health; provision exact client/subject bindings and service credentials; verify
 Access permits the required server-to-server paths without weakening browser
 policy; activate and exercise portal→mail and native password/revocation flows.
 A local suite or security scan is not proof of deployed end-to-end acceptance.
+
+### Portal pilot self-read credential
+
+The interim portal still uses the existing MCP OAuth client. Each new consent creates a new connection, so a grant keyed to one connection is not durable. The gateway aliases the signed actor only for the registered portal client's `access_my_access` and `access_my_mailboxes` calls to the exact Office pilot Worker. It verifies the stored client ID, redirect, user, organization, connection status and active person enrollment. The stable subject is `credential:oauth:office-portal-<user-id>` and requires an explicit Office viewer grant. Other calls retain their original credential. Signed tool-call binding prevents reuse for other operations, while gateway audit retains the real connection ID. Lookup failure refuses the call without invoking Office.
+
+This bounded pilot compatibility path does not enable person-only administrative actions through MCP or replace the planned portal resource-token integration.

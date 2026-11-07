@@ -549,6 +549,17 @@ async function runAppTool(
   // principal's access; the write wrapper and a direct call mint the
   // principal's own.
   const access = ctx.via?.ceiling === "read" ? "read" : principal.access;
+  let actor = actorFor(principal);
+  try {
+    actor = (await deps.actorForTool?.(principal, app, tool)) ?? actor;
+  } catch {
+    audit(name, { ...allowed, outcome: "unreachable" });
+    return {
+      kind: "result",
+      result: errorResult("The gateway could not confirm this credential. Try again."),
+      tool: called,
+    };
+  }
   const identity = await mintIdentityJwt(deps.signing.privateKeyPem, {
     subject: {
       sub: principal.userId,
@@ -561,7 +572,7 @@ async function runAppTool(
     issuer: deps.signing.issuer,
     keyId: deps.signing.keyId,
     channel: "mcp",
-    actor: { sub: actorFor(principal) },
+    actor: { sub: actor },
     scopes: scopesForAccess(access),
     toolCall: { id: ctx.callId, name: tool.name },
   });

@@ -53,6 +53,16 @@ function harness(answer: (request: Request) => Response | Promise<Response>) {
 }
 
 describe("executeToolCall", () => {
+  it("audits and refuses failed host credential resolution without invoking an app", async () => {
+    const { deps, requests, events } = harness(() => ok());
+    deps.actorForTool = async () => { throw new Error("private database detail"); };
+    const answer = await executeToolCall(appView(), { name: "create_todo", arguments: { title: "milk" }, protocolVersion: "2026-07-28" }, deps);
+    expect(requests).toHaveLength(0);
+    expect(answer).toMatchObject({ kind: "result", result: { isError: true } });
+    expect(JSON.stringify(answer)).not.toContain("private database detail");
+    expect(events[0]).toMatchObject({ credentialKind: "pat", credentialId: "pat_1", outcome: "unreachable" });
+  });
+
   it("calls the app once with an identity minted for exactly this call", async () => {
     const { deps, requests, events, drifted } = harness(() => ok("created"));
 
