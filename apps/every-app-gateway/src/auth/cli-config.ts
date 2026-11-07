@@ -1,3 +1,4 @@
+import { officeIdentityPlugins } from './office-identity';
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, organization } from "better-auth/plugins";
@@ -21,6 +22,7 @@ import { signInProviders } from "./sign-in-providers/plugin";
 export const auth = betterAuth({
   ...sharedAuthOptions,
   plugins: [
+    ...officeIdentityPlugins({} as import("../server/office-identity/service").IdentityEnv),
     admin(),
     organization({ schema: organizationSchema }),
     gatewaySchema(),

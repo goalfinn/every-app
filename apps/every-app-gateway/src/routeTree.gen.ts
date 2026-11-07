@@ -22,6 +22,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppOrganizationsRouteImport } from './routes/_app/organizations'
+import { Route as IdentityConsentRouteImport } from './routes/identity/consent'
 import { Route as OauthConsentRouteImport } from './routes/oauth/consent'
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
 import { Route as AppAdminActivityRouteImport } from './routes/_app/admin/activity'
@@ -106,6 +107,11 @@ const AppOrganizationsRoute = AppOrganizationsRouteImport.update({
   id: '/organizations',
   path: '/organizations',
   getParentRoute: () => AppRoute,
+} as any)
+const IdentityConsentRoute = IdentityConsentRouteImport.update({
+  id: '/identity/consent',
+  path: '/identity/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const OauthConsentRoute = OauthConsentRouteImport.update({
   id: '/oauth/consent',
@@ -222,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/admin': typeof AppAdminRouteWithChildren
   '/organizations': typeof AppOrganizationsRoute
+  '/identity/consent': typeof IdentityConsentRoute
   '/oauth/consent': typeof OauthConsentRoute
   '/admin/activity': typeof AppAdminActivityRoute
   '/admin/apps': typeof AppAdminAppsRoute
@@ -254,6 +261,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/verify-email': typeof VerifyEmailRoute
   '/organizations': typeof AppOrganizationsRoute
+  '/identity/consent': typeof IdentityConsentRoute
   '/oauth/consent': typeof OauthConsentRoute
   '/': typeof AppIndexRoute
   '/admin/activity': typeof AppAdminActivityRoute
@@ -290,6 +298,7 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/organizations': typeof AppOrganizationsRoute
+  '/identity/consent': typeof IdentityConsentRoute
   '/oauth/consent': typeof OauthConsentRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/activity': typeof AppAdminActivityRoute
@@ -327,6 +336,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/admin'
     | '/organizations'
+    | '/identity/consent'
     | '/oauth/consent'
     | '/admin/activity'
     | '/admin/apps'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/verify-email'
     | '/organizations'
+    | '/identity/consent'
     | '/oauth/consent'
     | '/'
     | '/admin/activity'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/_app/admin'
     | '/_app/organizations'
+    | '/identity/consent'
     | '/oauth/consent'
     | '/_app/'
     | '/_app/admin/activity'
@@ -428,6 +440,7 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  IdentityConsentRoute: typeof IdentityConsentRoute
   OauthConsentRoute: typeof OauthConsentRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDevIdentityRoute: typeof ApiDevIdentityRoute
@@ -529,6 +542,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/organizations'
       preLoaderRoute: typeof AppOrganizationsRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/identity/consent': {
+      id: '/identity/consent'
+      path: '/identity/consent'
+      fullPath: '/identity/consent'
+      preLoaderRoute: typeof IdentityConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/oauth/consent': {
       id: '/oauth/consent'
@@ -743,6 +763,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  IdentityConsentRoute: IdentityConsentRoute,
   OauthConsentRoute: OauthConsentRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDevIdentityRoute: ApiDevIdentityRoute,

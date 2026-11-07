@@ -34,6 +34,9 @@ const LOCAL_D1_ID = createHash("sha256")
 // The catalog's come from the SDK, which generates them from the catalog
 // (this file may not import @every-app/sdk/internal, which the Worker loads).
 export const OPTIONAL_SECRETS = [
+  "OFFICE_IDENTITY_ENABLED",
+  "OFFICE_IDENTITY_ORGANIZATION_ID",
+  "OFFICE_IDENTITY_SERVICE_KEYS",
   // Every setting a catalog provider reads (its key, a Basic username,
   // a host setting, an OAuth client's id and secret), generated from
   // packages/sdk/src/internal/capabilities.ts.

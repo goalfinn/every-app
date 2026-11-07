@@ -222,8 +222,14 @@ function SignIn() {
       const { error: signInError } = await authClient.signIn.email(
         { email, password },
         {
-          onSuccess: async () => {
+          onSuccess: async ({ data }) => {
             continued.current = true;
+            // The provider validated the signed OAuth request and registered
+            // callback. Finish that flow before the ordinary launcher redirect.
+            if (data?.redirect === true && typeof data.url === "string") {
+              window.location.assign(data.url);
+              return;
+            }
             // A provider sign-in found this account but couldn't link it:
             // now that the password proved it, connect that provider.
             if (errorProvider && shouldLinkAfterPasswordSignIn(accessError)) {
