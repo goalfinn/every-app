@@ -17,6 +17,7 @@ import type {
   ToolCallAuditEvent,
 } from "@every-app/toolbus";
 import { resolveDeploymentMode } from "@/server/deployment-mode";
+import { portalSelfReadActor } from "@/server/office-identity/portal-self-read";
 import { announceToolCall, toolCallIsEvent } from "@/server/events/tool-events";
 import { McpToolCallRepository } from "@/server/repositories/McpToolCallRepository";
 import {
@@ -110,6 +111,8 @@ export function toolBusHttp(): Promise<ToolBusHttpHandler> {
           if (!app) throw new Error(`no route for app "${target.appId}"`);
           return appFetcherFor(app).fetch(request);
         },
+        actorForTool: (principal, app, tool) =>
+          portalSelfReadActor(env, principal, app, tool),
         onCatalogDrift: (target) => {
           const app = servedApps.get(target);
           if (app) scheduleCatalogResync(app);

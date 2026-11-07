@@ -251,6 +251,9 @@ export interface WorkspaceHost {
 
 export interface ToolBusDeps {
   signing: ToolBusSigning;
+  /** Host-attested credential alias for one app/tool; null preserves the real credential.
+   * Auditing and authorization always retain the original principal. */
+  actorForTool?(principal: McpPrincipal, app: ToolBusApp, tool: ToolBusTool): Promise<string | null>;
   /** Send a request to the app's Worker (service binding; vite in dev). */
   invokeApp(app: ToolBusApp, request: Request): Promise<Response>;
   /**

@@ -1,3 +1,4 @@
+import { oauthProviderClient } from '@better-auth/oauth-provider/client';
 import { createAuthClient } from "better-auth/react";
 import { organizationClient } from "better-auth/client/plugins";
 
@@ -41,7 +42,7 @@ class CpuTimeoutError extends Error {
 const authClient = createAuthClient({
   // This client should only be used in client-side code which will always have a window.
   baseURL: typeof window !== "undefined" ? window.location.origin : "",
-  plugins: [organizationClient()],
+  plugins: [organizationClient(), oauthProviderClient()],
   fetchOptions: {
     onResponse: async (ctx) => {
       // Continue unless it's potentially a Cloudflare error

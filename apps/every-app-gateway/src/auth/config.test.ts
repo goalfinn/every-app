@@ -48,6 +48,10 @@ vi.mock("better-auth/adapters/drizzle", () => ({
   drizzleAdapter: () => ({ adapter: "test" }),
 }));
 
+vi.mock("./office-identity", () => ({
+  officeIdentityPlugins: () => [{ id: "jwt" }, { id: "oauth-provider" }],
+}));
+
 vi.mock("better-auth/plugins", () => ({
   admin: () => ({ id: "admin" }),
   organization: (options: unknown) => ({ id: "organization", options }),
@@ -389,6 +393,8 @@ describe("createAuth Better Auth options", () => {
 
   it("registers tanstackStartCookies last", () => {
     expect(createAuthOptions().plugins.map((plugin) => plugin.id)).toEqual([
+      "jwt",
+      "oauth-provider",
       "admin",
       "organization",
       "every-app-schema",
@@ -558,6 +564,20 @@ describe("createAuth sign-up and organization hooks", () => {
   beforeEach(() => {
     mockHasOwner.mockReset();
     mockFindInvitation.mockReset();
+  });
+
+  it("closes identity and resource administration endpoints while identity is disabled", async () => {
+    for (const path of [
+      "/oauth2/authorize",
+      "/admin/oauth2/resources",
+      "/admin/oauth2/resources/test/clients/test",
+      "/jwks",
+      "/.well-known/openid-configuration",
+    ]) {
+      await expect(
+        before()({ path, request: httpRequest(path) }),
+      ).rejects.toThrow("Not found");
+    }
   });
 
   it("rejects HTTP sign-up without an invitation, before and after an owner exists", async () => {

@@ -229,6 +229,21 @@ function refuseBypassedPath(): Response {
 async function serveGatewayHost(request: Request): Promise<Response> {
   const { pathname } = new URL(request.url);
   if (pathname === HEALTH_PATH) return serveHealth(request, env.DB);
+  if (pathname.startsWith("/api/identity/v1/")) {
+    const { serveIdentity } = await import("./server/office-identity/service");
+    return serveIdentity(request, env);
+  }
+  if (
+    pathname === "/.well-known/openid-configuration" &&
+    env.OFFICE_IDENTITY_ENABLED === "true"
+  ) {
+    const { oauthProviderOpenIdConfigMetadata } = await import(
+      "@better-auth/oauth-provider"
+    );
+    const { auth } = await import("./auth");
+    return oauthProviderOpenIdConfigMetadata(auth)(request);
+  }
+
   if (
     pathname.startsWith("/api/v1/") &&
     platformPolicy(env).thirdPartyDeploys

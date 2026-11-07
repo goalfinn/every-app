@@ -1,3 +1,4 @@
+import { officeIdentityPlugins } from "./office-identity";
 import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -479,8 +480,9 @@ export function createAuth() {
       : {}),
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins,
-    disabledPaths: DISABLED_AUTH_PATHS,
+    disabledPaths: [...DISABLED_AUTH_PATHS, "/token"],
     plugins: [
+      ...officeIdentityPlugins(env),
       admin(),
       organization({
         // Only the gateway creates organizations: the setup claim (a
@@ -582,6 +584,16 @@ export function createAuth() {
       // no request: those come from gateway code (the setup claim), not from
       // a client, and are allowed.
       before: createAuthMiddleware(async (ctx) => {
+        if (
+          (ctx.path.startsWith("/oauth2/") ||
+            ctx.path.startsWith("/admin/oauth2/") ||
+            ctx.path === "/jwks" ||
+            ctx.path.startsWith("/.well-known/openid")) &&
+          env.OFFICE_IDENTITY_ENABLED !== "true"
+        ) {
+          throw new APIError("NOT_FOUND", { message: "Not found" });
+        }
+
         if (!ctx.request) {
           return;
         }

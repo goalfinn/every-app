@@ -286,6 +286,17 @@ describe("ToolBus + real SDK app", () => {
     expect(events[0]).toMatchObject({ outcome: "ok", decision: "allowed" });
   });
 
+  it("keeps host credential aliases bound to the call and audits the real credential", async () => {
+    seenUsers.length = 0;
+    const { serve, events } = harness({ actorForTool: async () => "oauth:office-portal-user_1" });
+    await serve(legacyRequest("tools/call", { name: "list_todos", arguments: {} }), view());
+    expect(seenUsers).toEqual([expect.objectContaining({
+      id: "user_1", actor: { sub: "oauth:office-portal-user_1" },
+      toolCall: { id: events[0]!.callId, name: "list_todos" },
+    })]);
+    expect(events[0]).toMatchObject({ credentialKind: "pat", credentialId: "pat_1" });
+  });
+
   it("passes the app's own validation and ToolError messages through", async () => {
     const { serve, events } = harness();
     const refined = await rpcBody(
